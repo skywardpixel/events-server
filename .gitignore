@@ -1,0 +1,17 @@
+# Vendor
+/vendor/*
+
+# Logs
+/logs/*
+
+# Cache, etc.
+/storage/*
+
+# Databases
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# Heroku
+Procfile
