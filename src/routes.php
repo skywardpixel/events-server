@@ -49,4 +49,8 @@ $app->group('/api/admin', function () {
     $this->delete('/event/{id:[0-9]+}',
         EventController::class . ':delete'
     )->setName('delete_event');
+
+    $this->delete('/participant/{id:[0-9]+}',
+        ParticipantController::class . ':delete'
+    )->setName('delete_participant');
 })->add($authMiddleware->withRequiredScope(['admin']));
