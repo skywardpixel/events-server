@@ -32,13 +32,6 @@ return [
             'secure' => 'tls',
             'port' => 587,
             'notify_address' => 'notify@example.com',
-        ],
-        'client_credentials' => [
-            'root' => [
-                'client_id' => 'root',
-                'client_secret' => 'password',
-                'scope' => 'admin'
-            ]
         ]
     ],
 ];
