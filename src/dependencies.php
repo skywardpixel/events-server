@@ -35,6 +35,10 @@ $container['mailer'] = function($c) {
     $mail->password = $settings['password'];
     $mail->secure = $settings['secure'];
     $mail->port = $settings['port'];
+    $mail->setFrom($settings['from'], 'Micetek Events');
+    foreach($settings['receivers'] as $address) {
+        $mail->addAddress($address);
+    }
     return $mail;
 };
 
@@ -52,7 +56,7 @@ $container['App\Controllers\ParticipantController'] = function ($c) {
 };
 
 $container['OAuth2Server'] = function ($c) {
-    $pdo = new PDO('sqlite:' . __DIR__ . '/../oauth.sqlite3');
+    $pdo = new PDO($c['settings']['oauth_pdo']);
     $storage = new PdoStorage($pdo);
     $server = new OAuth2\Server($storage);
     $userCreds = new OAuth2\GrantType\UserCredentials($storage);

@@ -17,7 +17,7 @@ class ParticipantController {
     protected $mailer;
     protected $table;
 
-    public function __construct( Logger $logger, PHPMailer $mailer, Builder $table) {
+    public function __construct(Logger $logger, PHPMailer $mailer, Builder $table) {
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->table = $table;
@@ -32,19 +32,32 @@ class ParticipantController {
             'email' => $data['email']
         ]);
         $participant->event()->associate($event);
-        if ($participant->save()) {
+        if ($participant->save() && $this->sendNotification($event, $participant)) {
             return $response->withJson([
                 'message' => 'success'
             ]);
         } else {
             return $response->withJson([
                 'message' => 'failure'
-            ]);
+            ])->withStatus(500);
         }
     }
 
     private function sendNotification(Event $event, Participant $participant) {
-        // TODO:
+        $subject = 'New participant for ' . $event->title;
+        $body = $participant->name . ' (' . $participant->email . ')'
+            . ' has registered for your event ' . $event->title;
+        // $this->logger->info($body);
+
+        $this->mailer->Subject = $subject;
+        $this->mailer->Body = $body;
+        try {
+            return $this->mailer->send();
+        } catch (Exception $e) {
+            $this->logger->error('Message could not be sent. Mailer Error: ' . $this->mailer->ErrorInfo);
+            return false;
+        }
+        // return true;
     }
 
     public function delete(Request $request, Response $response, array $args) {
