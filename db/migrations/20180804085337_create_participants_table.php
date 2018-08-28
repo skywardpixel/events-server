@@ -35,6 +35,8 @@ class CreateParticipantsTable extends AbstractMigration
         $table = $this->table('participants');
         $table->addColumn('name', 'string')
               ->addColumn('email', 'string')
+              ->addColumn('phone', 'string')
+              ->addColumn('company', 'string')
               ->addColumn('event_id', 'integer')
               ->addForeignKey('event_id', 'events', 'id', ['delete'=> 'CASCADE', 'update'=> 'CASCADE'])
               ->create();

@@ -27,7 +27,7 @@ $container['db'] = function ($c) {
 $container['mailer'] = function($c) {
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     $settings = $c['settings']['phpmailer'];
-    $mail->setFrom($settings['from'], 'Micetek Events');
+    $mail->setFrom($settings['from'], 'Micetek Events', 0);
     foreach($settings['receivers'] as $address) {
         $mail->addAddress($address);
     }
@@ -60,6 +60,9 @@ $container['OAuth2Server'] = function ($c) {
 
 $container['Recaptcha'] = function ($c) {
     $settings = $c->get('settings')['recaptcha'];
-    $recaptcha = new \ReCaptcha\ReCaptcha($settings['secret']);
+    $recaptcha = new \ReCaptcha\ReCaptcha(
+        $settings['secret'],
+        new \ReCaptcha\RequestMethod\CurlPost()
+    );
     return $recaptcha;
 };

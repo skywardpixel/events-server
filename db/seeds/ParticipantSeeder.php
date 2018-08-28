@@ -18,18 +18,25 @@ class ParticipantSeeder extends AbstractSeed
         $data = [
             [
                 'name' => 'Kyle Yan',
-                'email' => 'kyleyan@uw.edu',
+                'email' => 'kyle@somewhere.com',
+                'company' => 'Somewhere',
+                'phone' => '1872229992',
                 'event_id' => '1'
-            ],            [
+            ],
+            [
                 'name' => 'Kyle Yan',
-                'email' => 'kyleyan@uw.edu',
+                'email' => 'kyle@somewhere.com',
+                'company' => 'Somewhere',
+                'phone' => '1872229992',
                 'event_id' => '2'
             ],
             [
                 'name' => 'Jerry Yan',
-                'email' => 'jerry@micetek.com',
-                'event_id' => '2'
-            ]
+                'email' => 'jerry@somewhere.com',
+                'company' => 'Somewhere',
+                'phone' => '2012829999',
+                'event_id' => '1'
+            ],
         ];
 
         $table = $this->table('participants');

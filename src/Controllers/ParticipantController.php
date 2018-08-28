@@ -28,35 +28,39 @@ class ParticipantController {
 
     public function signup(Request $request, Response $response, array $args) {
         $recaptchaResponse = $request->getParsedBody()['recaptchaResponse'];
-        $resp = $this->recaptcha->verify($recaptchaResponse);
+        $remoteIp = $_SERVER['REMOTE_ADDR'];
+        $resp = $this->recaptcha->verify($recaptchaResponse, $remoteIp);
         if (!$resp->isSuccess()) {
             $errors = $resp->getErrorCodes();
             return $response->withJson([
-                'message' => 'invalid recaptcha response'
+                'message' => 'invalid recaptcha response',
+                'errors' => $errors
             ])->withStatus(400);
-        }
-
-        $data = $request->getParsedBody()['participantData'];
-        $event = Event::find($args['id']);
-        $this->logger->info('Signup for event ' . $args['id']);
-        if (!($data['name'] && $data['email'])) {
-            return $response->withJson([
-                'message' => 'invalid data'
-            ])->withStatus(400);
-        }
-        $participant = Participant::create([
-            'name' => $data['name'],
-            'email' => $data['email']
-        ]);
-        $participant->event()->associate($event);
-        if ($participant->save()/* && $this->sendNotification($event, $participant)*/) {
-            return $response->withJson([
-                'message' => 'success'
-            ]);
         } else {
-            return $response->withJson([
-                'message' => 'failure'
-            ])->withStatus(500);
+            $data = $request->getParsedBody()['participantData'];
+            $event = Event::find($args['id']);
+            $this->logger->info('New registration for event ' . $event->title . '.');
+            if (!($data['name'] && $data['email'])) {
+                return $response->withJson([
+                    'message' => 'invalid data'
+                ])->withStatus(400);
+            }
+            $participant = Participant::create([
+                'name' => $data['name'],
+                'email' => $data['email']
+            ]);
+            $participant->event()->associate($event);
+            if ($participant->save() && $this->sendNotification($event, $participant)) {
+                $this->logger->info('Successfully saved and sent email.');
+                return $response->withJson([
+                    'message' => 'success'
+                ]);
+            } else {
+                $this->logger->info('Registration failure.');
+                return $response->withJson([
+                    'message' => 'failure'
+                ])->withStatus(500);
+            }
         }
     }
 
