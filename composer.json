@@ -13,7 +13,8 @@
         "aptoma/twig-markdown": "^2.0",
         "ext-pdo_sqlite": "*",
         "chadicus/slim-oauth2-middleware": "^3.3",
-        "tuupola/cors-middleware": "^0.5.2"
+        "tuupola/cors-middleware": "^0.5.2",
+        "google/recaptcha": "^1.2"
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public",

@@ -38,6 +38,9 @@ return [
                 'example@gmail.com',
                 'hello@gmail.com'
             ]
+        ],
+        'recaptcha' => [
+            'secret' => 'secret'
         ]
     ],
 ];
