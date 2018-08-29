@@ -48,6 +48,7 @@ class EventController {
             'description' => $data['description']
         ]);
         $event->save();
+        return $response->withJson($event);
     }
 
     public function update(Request $request, Response $response, array $args) {
@@ -58,6 +59,7 @@ class EventController {
         $event->date_time = $data['date_time'];
         $event->description = $data['description'];
         $event->save();
+        return $response->withJson($event);
     }
 
 }
