@@ -27,6 +27,7 @@ $container['db'] = function ($c) {
 $container['mailer'] = function ($c) {
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     $settings = $c['settings']['phpmailer'];
+    $mail->CharSet = 'UTF-8';
     if ($settings['smtp']) {
         $mail->SMTPDebug = 4;
         $mail->isSMTP();
