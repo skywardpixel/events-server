@@ -24,9 +24,26 @@ $container['db'] = function ($c) {
     return $capsule;
 };
 
-$container['mailer'] = function($c) {
+$container['mailer'] = function ($c) {
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     $settings = $c['settings']['phpmailer'];
+    if ($settings['smtp']) {
+        $mail->SMTPDebug = 4;
+        $mail->isSMTP();
+        $mail->SMTPOptions = array(
+            "ssl" => array(
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+                "allow_self_signed" => true
+            )
+        );
+        $mail->Host = $settings['smtp_server'];
+        $mail->SMTPAuth = false;
+        $mail->SMTPSecure = false;
+        $mail->Username = $settings['username'];
+        $mail->Password = $settings['password'];
+        $mail->Port = $settings['port'];
+    }
     $mail->setFrom($settings['from'], 'Micetek Events', 0);
     foreach($settings['receivers'] as $address) {
         $mail->addAddress($address);

@@ -40,14 +40,16 @@ class ParticipantController {
             $data = $request->getParsedBody()['participantData'];
             $event = Event::find($args['id']);
             $this->logger->info('New registration for event ' . $event->title . '.');
-            if (!($data['name'] && $data['email'])) {
+            if (!($data['name'] && $data['email'] && $data['company'] && $data['phone'])) {
                 return $response->withJson([
-                    'message' => 'invalid data'
+                    'message' => 'Invalid participant data.'
                 ])->withStatus(400);
             }
             $participant = Participant::create([
                 'name' => $data['name'],
-                'email' => $data['email']
+                'email' => $data['email'],
+                'company' => $data['company'],
+                'phone' => $data['phone'],
             ]);
             $participant->event()->associate($event);
             if ($participant->save() && $this->sendNotification($event, $participant)) {
@@ -65,15 +67,20 @@ class ParticipantController {
     }
 
     private function sendNotification(Event $event, Participant $participant) {
-        $subject = 'New participant for ' . $event->title;
-        $body = $participant->name . ' (' . $participant->email . ')'
-            . ' has registered for your event ' . $event->title;
-        // $this->logger->info($body);
+        $subject = "New participant for $event->title";
+        $body = "A new participant has registered for your event $event->title.\n";
+        $body .= "Name: $participant->name\n";
+        $body .= "Email: $participant->email\n";
+        $body .= "Company: $participant->company\n";
+        $body .= "Phone: $participant->phone\n";
 
         $this->mailer->Subject = $subject;
         $this->mailer->Body = $body;
         try {
-            return $this->mailer->send();
+            ob_start();
+            $result = $this->mailer->send();
+            ob_get_clean();
+            return result;
         } catch (Exception $e) {
             $this->logger->error('Message could not be sent. Mailer Error: ' . $this->mailer->ErrorInfo);
             return false;

@@ -27,12 +27,12 @@ return [
             'prefix'    => '',
         ],
         'phpmailer' => [
+            'smtp' => false,
             // 'smtp_server' => 'smtp.gmail.com',
             // 'username' => 'example@gmail.com',
             // 'password' => 'example',
             // 'secure' => 'tls',
             // 'port' => 587,
-            'notify_address' => 'example@gmail.com',
             'from' => 'example@gmail.com',
             'receivers' => [
                 'example@gmail.com',
