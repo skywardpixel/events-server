@@ -10,7 +10,7 @@ return [
         ],
         // Monolog settings
         'logger' => [
-            'name' => 'slim-app',
+            'name' => 'events',
             'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/app.log',
             'level' => \Monolog\Logger::DEBUG,
         ],
@@ -26,21 +26,18 @@ return [
             // 'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
         ],
-        'phpmailer' => [
-            'smtp' => false,
-            // 'smtp_server' => 'smtp.gmail.com',
-            // 'username' => 'example@gmail.com',
-            // 'password' => 'example',
-            // 'secure' => 'tls',
-            // 'port' => 587,
-            'from' => 'example@gmail.com',
-            'receivers' => [
-                'example@gmail.com',
-                'hello@gmail.com'
-            ]
+        'sendgrid' => [
+            'API_KEY' => '',
         ],
         'recaptcha' => [
-            'secret' => 'secret'
-        ]
+            'secret' => '',
+        ],
+        'email' => [
+            'to_addresses' => [
+                'test@example.com',
+            ],
+            'from_address' => 'hello@example.com',
+            'from_name' => 'Hello World',
+        ],
     ],
 ];

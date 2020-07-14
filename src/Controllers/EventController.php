@@ -3,11 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\Event;
-use App\Models\Participant;
 use Monolog\Logger;
 use Illuminate\Database\Query\Builder;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response as Response;
 
 class EventController {
     protected $logger;

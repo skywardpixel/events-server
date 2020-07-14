@@ -1,8 +1,6 @@
 <?php
 
 use App\MyAuth\PdoStorage;
-use Aptoma\Twig\Extension\MarkdownExtension;
-use Aptoma\Twig\Extension\MarkdownEngine;
 
 $container = $app->getContainer();
 
@@ -24,32 +22,9 @@ $container['db'] = function ($c) {
     return $capsule;
 };
 
-$container['mailer'] = function ($c) {
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-    $settings = $c['settings']['phpmailer'];
-    $mail->CharSet = 'UTF-8';
-    if ($settings['smtp']) {
-        $mail->SMTPDebug = 4;
-        $mail->isSMTP();
-        $mail->SMTPOptions = array(
-            "ssl" => array(
-                "verify_peer" => false,
-                "verify_peer_name" => false,
-                "allow_self_signed" => true
-            )
-        );
-        $mail->Host = $settings['smtp_server'];
-        $mail->SMTPAuth = false;
-        $mail->SMTPSecure = false;
-        $mail->Username = $settings['username'];
-        $mail->Password = $settings['password'];
-        $mail->Port = $settings['port'];
-    }
-    $mail->setFrom($settings['from'], 'Micetek Events', 0);
-    foreach($settings['receivers'] as $address) {
-        $mail->addAddress($address);
-    }
-    return $mail;
+$container['sendgrid'] = function ($c) {
+    $sendgrid = new \SendGrid($c['settings']['sendgrid']['API_KEY']);
+    return $sendgrid;
 };
 
 $container['App\Controllers\EventController'] = function ($c) {
@@ -61,9 +36,11 @@ $container['App\Controllers\EventController'] = function ($c) {
 $container['App\Controllers\ParticipantController'] = function ($c) {
     $logger = $c->get('logger');
     $table = $c->get('db')->table('participants');
-    $mailer = $c->get('mailer');
+    $sendgrid = $c->get('sendgrid');
     $recaptcha = $c->get('Recaptcha');
-    return new \App\Controllers\ParticipantController($logger, $mailer, $table, $recaptcha);
+    $email_config = $c->get('settings')['email'];
+    return new \App\Controllers\ParticipantController($logger, $sendgrid, $table,
+            $recaptcha, $email_config);
 };
 
 $container['OAuth2Server'] = function ($c) {

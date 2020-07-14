@@ -4,26 +4,27 @@ namespace App\Controllers;
 
 use App\Models\Event;
 use App\Models\Participant;
-use Slim\Views\Twig;
 use Monolog\Logger;
 use Illuminate\Database\Query\Builder;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 use ReCaptcha\ReCaptcha;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response as Response;
+use SendGrid;
 
 class ParticipantController {
     protected $logger;
-    protected $mailer;
+    protected $sendgrid;
     protected $table;
     protected $recaptcha;
+    protected $email_config;
 
-    public function __construct(Logger $logger, PHPMailer $mailer, Builder $table, Recaptcha $recaptcha) {
+    public function __construct(Logger $logger, SendGrid $sendgrid,
+            Builder $table, Recaptcha $recaptcha, array $email_config) {
         $this->logger = $logger;
-        $this->mailer = $mailer;
+        $this->sendgrid = $sendgrid;
         $this->table = $table;
         $this->recaptcha = $recaptcha;
+        $this->email_config = $email_config;
     }
 
     public function signup(Request $request, Response $response, array $args) {
@@ -74,18 +75,23 @@ class ParticipantController {
         $body .= "Company: $participant->company\n";
         $body .= "Phone: $participant->phone\n";
 
-        $this->mailer->Subject = $subject;
-        $this->mailer->Body = $body;
+        $email = new \SendGrid\Mail\Mail();
+        $email->setFrom($this->email_config['from_address'], $this->email_config['from_name']);
+        $email->setSubject($subject);
+        foreach ($this->email_config['to_addresses'] as $to) {
+            $email->addTo($to);
+        }
+        $email->addContent("text/plain", $body);
         try {
-            ob_start();
-            $result = $this->mailer->send();
-            ob_get_clean();
-            return result;
-        } catch (Exception $e) {
-            $this->logger->error('Message could not be sent. Mailer Error: ' . $this->mailer->ErrorInfo);
+            $response = $this->sendgrid->send($email);
+            $this->logger->info($response->statusCode() . "\n");
+            $this->logger->info($response->headers());
+            $this->logger->info($response->body() . "\n");
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error('Caught exception: ' . $e->getMessage() . "\n");
             return false;
         }
-        // return true;
     }
 
     public function delete(Request $request, Response $response, array $args) {
