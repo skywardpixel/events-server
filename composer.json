@@ -3,7 +3,7 @@
     "description": "An event registration platform.",
     "require": {
         "slim/slim": "^3.10",
-        "illuminate/database": "^5.4",
+        "illuminate/database": "^6.20",
         "robmorgan/phinx": "^0.10.5",
         "monolog/monolog": "^1.23",
         "slim/csrf": "^0.8.2",
